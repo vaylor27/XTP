@@ -7,7 +7,7 @@
 class Event {
 
 public:
-    ~Event() = default;
+    virtual ~Event() = default;
 
     virtual std::string getEventType() = 0;
 

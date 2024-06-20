@@ -1,4 +1,4 @@
-.idea/
 cmake-build-debug
 cmake-build-release
 lib/
+.idea/workspace.xml

@@ -2,16 +2,17 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 #include <vector>
+#include <unordered_map>
 #include "Event.h"
 
 
 class Events {
 public:
-    static std::unordered_map<std::string, std::vector<Event>> registeredEvents;
+    static std::unordered_map<std::string, std::vector<Event*>> registeredEvents;
 
     static void registerEvent(Event& event);
 
-    static std::vector<Event> getEventsForName(const std::string& name);
+    static std::vector<Event*> getEventsForName(const std::string& name);
 };
 
 
