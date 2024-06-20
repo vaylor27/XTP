@@ -1,0 +1,5 @@
+
+#ifndef XTPRENDERDATA_H
+#define XTPRENDERDATA_H
+
+#endif //XTPRENDERDATA_H
