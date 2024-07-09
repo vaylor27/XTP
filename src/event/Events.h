@@ -1,18 +1,28 @@
 
 #ifndef EVENTS_H
 #define EVENTS_H
+#include <functional>
 #include <vector>
 #include <unordered_map>
 #include "Event.h"
+#include "SimpleLogger.h"
 
 
 class Events {
 public:
-    static std::unordered_map<std::string, std::vector<Event*>> registeredEvents;
+    static std::vector<std::unique_ptr<Event>> registeredEvents;
 
-    static void registerEvent(Event& event);
+    static SimpleLogger* logger;
 
-    static std::vector<Event*> getEventsForName(const std::string& name);
+    static void registerEvent(std::unique_ptr<Event> event);
+
+    template <class EventClass> static void callFunctionOnAllEventsOfType(const std::function<void(EventClass*)>& func) {
+        for (const std::unique_ptr<Event>& event : registeredEvents) {
+            if (auto* ev = dynamic_cast<EventClass*>(event.get()); ev != nullptr) {
+                func(ev);
+            }
+        }
+    }
 };
 
 

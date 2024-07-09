@@ -6,7 +6,7 @@
 
 #include "XTPWindowBackend.h"
 
-class VulkanWindow: XTPWindowBackend {
+class VulkanWindow: public XTPWindowBackend {
 public:
 
     virtual bool createVulkanSurface(VkInstance instance, VkSurfaceKHR* surface) = 0;

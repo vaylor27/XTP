@@ -1,10 +1,14 @@
 #include "XTPWindowing.h"
 
-XTPWindowBackend* XTPWindowing::windowBackend = nullptr;
-XTPWindowData* XTPWindowing::data = nullptr;
+std::unique_ptr<XTPWindowBackend> XTPWindowing::windowBackend = nullptr;
+std::unique_ptr<XTPWindowData> XTPWindowing::data = nullptr;
 
-void XTPWindowing::setWindowBackend(XTPWindowBackend *backend) {
-    windowBackend = backend;
+void XTPWindowing::setWindowBackend(std::unique_ptr<XTPWindowBackend> backend) {
+    windowBackend = std::move(backend);
+}
+
+void XTPWindowing::setWindowData(std::unique_ptr<XTPWindowData> backend) {
+    data = std::move(backend);
 }
 
 void XTPWindowing::createWindow() {
@@ -29,4 +33,8 @@ void XTPWindowing::beginFrame() {
 
 void XTPWindowing::destroyWindow() {
     windowBackend->destroyWindow();
+}
+
+void XTPWindowing::getFramebufferSize(int *width, int *height) {
+    windowBackend->getFramebufferSize(width, height);
 }

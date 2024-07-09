@@ -1,9 +1,18 @@
-[submodule "lib/Vulkan-Headers"]
-	path = lib/Vulkan-Headers
-	url = https://github.com/KhronosGroup/Vulkan-Headers/
-[submodule "lib/Vulkan-Loader"]
-	path = lib/Vulkan-Loader
-	url = https://github.com/KhronosGroup/Vulkan-Loader/
+[submodule "lib/VulkanMemoryAllocator"]
+	path = lib/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw
 [submodule "lib/glm"]
 	path = lib/glm
-	url = https://github.com/icaven/glm
+	url = https://github.com/g-truc/glm
+[submodule "lib/glslang"]
+	path = lib/glslang
+	url = https://github.com/KhronosGroup/glslang
+[submodule "lib/Vulkan-Headers"]
+	path = lib/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "lib/Vulkan-Loader"]
+	path = lib/Vulkan-Loader
+	url = https://github.com/KhronosGroup/Vulkan-Loader

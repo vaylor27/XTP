@@ -5,7 +5,7 @@
 
 class XTPWindowData {
 public:
-    ~XTPWindowData() = default;
+    virtual ~XTPWindowData() = default;
 
     virtual const char* getWindowTitle() = 0;
 

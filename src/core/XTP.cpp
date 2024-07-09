@@ -1,32 +1,40 @@
 #include "XTP.h"
 
+#include "Events.h"
 #include "TimeManager.h"
 
-#include "XTPRendering.h"
 #include "XTPWindowing.h"
+#include "XTPVulkan.h"
 
 
 SimpleLogger* XTP::logger = new SimpleLogger("XTP Logger", DEBUG ? LogLevel::DEBUG: LogLevel::INFORMATION);
+Ticker* XTP::ticker;
+std::thread XTP::updateThread;
+bool XTP::doneExecuting;
 
-void XTP::init() {
+void XTP::init(const std::chrono::nanoseconds tickInterval) {
     if (XTPWindowing::windowBackend == nullptr) {
         logger->logCritical("Windowing Backend Is Not Set!");
     }
-    if (XTPRendering::renderBackend == nullptr) {
-        logger->logCritical("Windowing Backend Is Not Set!");
-    }
     XTPWindowing::windowBackend->createWindow();
-    XTPRendering::renderBackend->initializeBackend();
+    XTPVulkan::init();
+
     TimeManager::startup();
+    ticker = new Ticker(tickInterval, tick);
+
+    updateThread = std::thread(runTicker);
 }
 
-void XTP::start() {
-    init();
+void XTP::start(const std::chrono::nanoseconds tickInterval) {
+    init(tickInterval);
     while (!XTPWindowing::windowBackend->shouldClose()) {
-        XTPWindowing::windowBackend->beginFrame();
-        TimeManager::endFrame();
+        XTPWindowing::windowBackend->pollEvents();
+        XTPVulkan::render();
     }
+    //Ensure that the thread exits gracefully
+    updateThread.join();
     cleanUp();
+    std::cout << TimeManager::getAverageFPS() << std::endl;
 }
 
 SimpleLogger* XTP::getLogger() {
@@ -34,7 +42,21 @@ SimpleLogger* XTP::getLogger() {
 }
 
 void XTP::cleanUp() {
-    XTPRendering::renderBackend->cleanUp();
+    XTPVulkan::cleanUp();
     XTPWindowing::windowBackend->destroyWindow();
     delete logger;
+}
+
+void XTP::runTicker() {
+    while (!XTPWindowing::windowBackend->shouldClose()) {
+        ticker->tryExecute();
+    }
+}
+
+void XTP::tick() {
+    for (auto& [shader, renderables] : XTPVulkan::toRender) {
+        for (const std::shared_ptr<Renderable>& renderable : renderables) {
+            renderable->tick();
+        }
+    }
 }

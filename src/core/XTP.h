@@ -1,9 +1,9 @@
 #ifndef XTP_VQT_H
 #define XTP_VQT_H
 
-#include <iostream>
-
 #include "SimpleLogger.h"
+#include "Ticker.h"
+#include <thread>
 
 class XTP {
 
@@ -15,22 +15,25 @@ public:
     static constexpr bool DEBUG = true;
 #endif
 
+    static bool doneExecuting;
 
-#define MAKE_VERSION(major, minor, patch) \
-((((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))
+    static void init(std::chrono::nanoseconds tickInterval);
 
-    static constexpr std::string_view engineName = "VQT Engine";
-    static constexpr uint32_t engineVersion = MAKE_VERSION(0, 0, 1);
-
-    static void init();
-
-    static void start();
+    static void start(std::chrono::nanoseconds tickInterval);
 
     static SimpleLogger* getLogger();
 
     static void cleanUp();
 
+    static void runTicker();
+
+    static void tick();
+
     static SimpleLogger* logger;
+
+    static Ticker* ticker;
+
+    static std::thread updateThread;
 };
 
 

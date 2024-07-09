@@ -1,4 +1,4 @@
 
 #include "GLFWVulkanWindowing.h"
 
-void* GLFWVulkanWindowing::window = nullptr;
+GLFWwindow* GLFWVulkanWindowing::window = nullptr;

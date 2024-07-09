@@ -1,17 +1,18 @@
 
 #ifndef EVENT_H
 #define EVENT_H
-#include <string>
 
+#include <string>
 
 class Event {
 
 public:
+
     virtual ~Event() = default;
 
-    virtual std::string getEventType() = 0;
-
-    virtual void onError() = 0;
+    virtual std::string getEventType() {
+        return "";
+    }
 };
 
 #endif //EVENT_H

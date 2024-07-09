@@ -1,16 +1,12 @@
 
 #include "Events.h"
+#include <string>
 
-std::unordered_map<std::string, std::vector<Event*>> Events::registeredEvents = {};
+#include "SimpleLogger.h"
 
-void Events::registerEvent(Event &event) {
-    if (registeredEvents.find(event.getEventType()) == registeredEvents.end()) {
-        registeredEvents.insert(std::make_pair(event.getEventType(), std::vector<Event*> {}));
-    }
+std::vector<std::unique_ptr<Event>> Events::registeredEvents;
+SimpleLogger* Events::logger = new SimpleLogger("XTP Events", INFORMATION);
 
-    registeredEvents[event.getEventType()].emplace_back(&event);
-}
-
-std::vector<Event*> Events::getEventsForName(const std::string& name) {
-    return registeredEvents[name];
+void Events::registerEvent(std::unique_ptr<Event> event) {
+    registeredEvents.emplace_back(std::move(event));
 }

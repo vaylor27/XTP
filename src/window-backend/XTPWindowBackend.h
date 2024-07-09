@@ -1,11 +1,13 @@
 
 #ifndef XTPWINDOW_H
 #define XTPWINDOW_H
-#include <utility>
 
+#include <iostream>
 
 class XTPWindowBackend {
 public:
+    bool framebufferResized;
+
     XTPWindowBackend() = default;
 
     virtual ~XTPWindowBackend() = default;
@@ -30,6 +32,12 @@ public:
     virtual bool supportsRenderer(const char* str) {
         return false;
     }
+
+    virtual void getFramebufferSize(int * width, int * height) = 0;
+
+    virtual void waitForEvents() = 0;
+
+    virtual void pollEvents() {}
 };
 
 

@@ -4,13 +4,23 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
-#include "XTPRenderInfo.h"
+#include "SimpleLogger.h"
 #include "XTPVulkan.h"
 
-
-class VulkanRenderInfo: public XTPRenderInfo {
+class VulkanRenderInfo {
 public:
-    ~VulkanRenderInfo() override = default;
+    static VulkanRenderInfo* INSTANCE;
+
+
+#ifdef NDEBUG
+    static constexpr bool ISDEBUG = false;
+#else
+    static constexpr bool ISDEBUG = true;
+#endif
+
+    SimpleLogger* validationLogger = new SimpleLogger("Vulkan Validation Layers", TRACE);
+    
+    virtual ~VulkanRenderInfo() = default;
 
     virtual VkPhysicalDeviceFeatures getPhysicalDeviceFeatures() {
         return {};
@@ -18,6 +28,10 @@ public:
 
     virtual std::vector<std::string> getRequiredDeviceExtensions() {
         return {};
+    }
+
+    virtual uint32_t getTickRateMilis() {
+        return 0;
     }
 
     virtual std::vector<std::string> getRequiredInstanceExtensions() {
@@ -55,13 +69,13 @@ public:
     virtual void onVulkanDebugMessage(const VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkFlags uint32, const VkDebugUtilsMessengerCallbackDataEXT * pCallbackData, void * pUserData, const std::string & message) {
         switch (messageSeverity) {
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
-                XTPVulkan::validationLogger->logTrace(message);
+                validationLogger->logTrace(message);
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
-                XTPVulkan::validationLogger->logInformation(message);
+                validationLogger->logInformation(message);
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
-                XTPVulkan::validationLogger->logWarning(message);
+                validationLogger->logWarning(message);
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-                XTPVulkan::validationLogger->logError(message);
+                validationLogger->logError(message, false);
             case VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT:
                 break;
         }
@@ -75,6 +89,13 @@ public:
         return VK_MAKE_VERSION(1, 0, 0);
     }
 
+    virtual VkClearValue getClearColor() {
+        return {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    }
+
+    virtual uint32_t getMaxFramesInFlight() {
+        return 2;
+    }
 };
 
 
