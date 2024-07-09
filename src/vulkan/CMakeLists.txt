@@ -48,7 +48,7 @@ if (NOT TARGET XTPVulkan)
         add_custom_command(
                 TARGET XTPVulkan POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/lib/MoltenVK/vulkan/icd.d/MoltenVK_icd.json
+                ${CMAKE_SOURCE_DIR}/lib/MoltenVK/MoltenVK_icd.json
                 ${CMAKE_BINARY_DIR}/bin/vulkan/icd.d/MoltenVK_icd.json)
     endif ()
 endif ()
