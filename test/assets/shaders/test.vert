@@ -1,5 +1,14 @@
 #version 450
 
+//layout(set = 0, binding = 0) uniform GlobalData {
+//    mat4 projectionMatrix;
+//    mat4 viewMatrix;
+//} global;
+//
+//layout(set = 1, binding = 0) uniform ObjectData {
+//    mat4 transformMatrix;
+//} obj;
+
 layout(location = 0) in vec2 inPosition;
 layout(location = 1) in vec3 inColor;
 
