@@ -6,10 +6,6 @@
 
 class ShaderRegisterEvent: public Event {
 public:
-    std::string getEventType() override {
-        return "XTPCore::ShaderRegisterEvent";
-    }
-
     virtual void onRegisterShaders() = 0;
 };
 

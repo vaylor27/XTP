@@ -12,8 +12,8 @@ function(compileShaders TARGET SHADER_DIR)
     set(SHADER_PRODUCTS)
 
     add_custom_command(TARGET XTPTest POST_BUILD
-            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/shaders
-            BYPRODUCTS "${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME}.spv"
+            COMMAND mkdir -p ${CMAKE_BINARY_DIR}/bin/assets/shaders
+            BYPRODUCTS "${CMAKE_BINARY_DIR}/bin/assets/shaders/${SHADER_NAME}.spv"
             COMMENT "Creating Shader Directory"
     )
 
@@ -22,13 +22,13 @@ function(compileShaders TARGET SHADER_DIR)
         cmake_path(GET SHADER_SOURCE FILENAME SHADER_NAME)
 
         # Build command
-        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/shaders")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/assets/shaders")
 
 
         add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ${CMAKE_BINARY_DIR}/bin/glslang -e main -V -o ${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME} ${SHADER_SOURCE}
-                BYPRODUCTS "${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME}.spv"
-                COMMENT "Compiling Shader (${SHADER_SOURCE}). Using Command: glslangValidator -e main -V -o ${CMAKE_BINARY_DIR}/bin/shaders/${SHADER_NAME} ${SHADER_SOURCE}"
+                COMMAND ${CMAKE_BINARY_DIR}/bin/glslang --target-env vulkan1.2 -e main -o ${CMAKE_BINARY_DIR}/bin/assets/shaders/${SHADER_NAME}.spv ${SHADER_SOURCE}
+                BYPRODUCTS "${CMAKE_BINARY_DIR}/bin/assets/shaders/${SHADER_NAME}.spv"
+                COMMENT "Compiling Shader (${SHADER_SOURCE}). Using Command: glslangValidator -e main -o ${CMAKE_BINARY_DIR}/bin/assets/shaders/${SHADER_NAME} ${SHADER_SOURCE}"
         )
     endforeach ()
 endfunction()

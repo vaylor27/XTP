@@ -16,3 +16,22 @@
 [submodule "lib/Vulkan-Headers"]
 	path = lib/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "lib/imgui"]
+	path = lib/imgui
+	url = https://github.com/ocornut/imgui/
+	branch = master
+[submodule "lib/implot"]
+	path = lib/implot
+	url = https://github.com/epezent/implot
+[submodule "lib/tracy"]
+	path = lib/tracy
+	url = https://github.com/wolfpld/tracy
+[submodule "lib/Vulkan-Descriptor-Allocator"]
+	path = lib/Vulkan-Descriptor-Allocator
+	url = https://github.com/vblanco20-1/Vulkan-Descriptor-Allocator
+[submodule "lib/SDL"]
+	path = lib/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "lib/tinygltf"]
+	path = lib/tinygltf
+	url = https://github.com/syoyo/tinygltf/

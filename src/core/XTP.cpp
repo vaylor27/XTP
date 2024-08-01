@@ -1,6 +1,9 @@
 #include "XTP.h"
 
+#include "Camera.h"
+#include "CleanUpEvent.h"
 #include "Events.h"
+#include "InitEvent.h"
 #include "TimeManager.h"
 
 #include "XTPWindowing.h"
@@ -10,7 +13,7 @@
 SimpleLogger* XTP::logger = new SimpleLogger("XTP Logger", DEBUG ? LogLevel::DEBUG: LogLevel::INFORMATION);
 Ticker* XTP::ticker;
 std::thread XTP::updateThread;
-bool XTP::doneExecuting;
+// std::thread XTP::renderThread;
 
 void XTP::init(const std::chrono::nanoseconds tickInterval) {
     if (XTPWindowing::windowBackend == nullptr) {
@@ -18,12 +21,24 @@ void XTP::init(const std::chrono::nanoseconds tickInterval) {
     }
     XTPWindowing::windowBackend->createWindow();
     XTPVulkan::init();
-
     TimeManager::startup();
+    Events::callFunctionOnAllEventsOfType<InitEvent>([](auto e) {e->onInit();});
+
     ticker = new Ticker(tickInterval, tick);
 
     updateThread = std::thread(runTicker);
+    // renderThread = std::thread(render);
+
 }
+
+// void XTP::render() {
+    // TimeManager::startup();
+    // Events::callFunctionOnAllEventsOfType<InitEvent>([](auto e) {e->onInit();});
+
+    // while (!XTPWindowing::windowBackend->shouldClose()) {
+        // XTPVulkan::render();
+    // }
+// }
 
 void XTP::start(const std::chrono::nanoseconds tickInterval) {
     init(tickInterval);
@@ -33,8 +48,9 @@ void XTP::start(const std::chrono::nanoseconds tickInterval) {
     }
     //Ensure that the thread exits gracefully
     updateThread.join();
+    // renderThread.join();
+
     cleanUp();
-    std::cout << TimeManager::getAverageFPS() << std::endl;
 }
 
 SimpleLogger* XTP::getLogger() {
@@ -42,6 +58,7 @@ SimpleLogger* XTP::getLogger() {
 }
 
 void XTP::cleanUp() {
+    Events::callFunctionOnAllEventsOfType<CleanUpEvent>([](auto e) {e->cleanUp();});
     XTPVulkan::cleanUp();
     XTPWindowing::windowBackend->destroyWindow();
     delete logger;
@@ -55,8 +72,10 @@ void XTP::runTicker() {
 
 void XTP::tick() {
     for (auto& [shader, renderables] : XTPVulkan::toRender) {
-        for (const std::shared_ptr<Renderable>& renderable : renderables) {
-            renderable->tick();
+        for (const auto&[material, renderables] : renderables) {
+            for (const auto& renderable : renderables) {
+                renderable->tick();
+            }
         }
     }
 }

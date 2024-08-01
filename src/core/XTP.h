@@ -15,9 +15,9 @@ public:
     static constexpr bool DEBUG = true;
 #endif
 
-    static bool doneExecuting;
-
     static void init(std::chrono::nanoseconds tickInterval);
+
+    static void render();
 
     static void start(std::chrono::nanoseconds tickInterval);
 
@@ -34,6 +34,7 @@ public:
     static Ticker* ticker;
 
     static std::thread updateThread;
+    // static std::thread renderThread;
 };
 
 

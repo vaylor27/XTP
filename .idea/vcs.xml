@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/SDL" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Vulkan-Descriptor-Allocator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Vulkan-Headers" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/Vulkan-Loader" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/VulkanMemoryAllocator" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/glslang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/imgui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/implot" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/tracy" vcs="Git" />
   </component>
 </project>

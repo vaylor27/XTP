@@ -5,10 +5,6 @@
 
 class FrameEvent: public Event {
 public:
-    std::string getEventType() override {
-        return typeid(FrameEvent).name();
-    }
-
     virtual void onFrameBegin() = 0;
     virtual void onFrameDrawBegin() = 0;
     virtual void onFrameDrawEnd() = 0;

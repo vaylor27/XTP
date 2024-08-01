@@ -7,13 +7,16 @@
   <component name="CidrRootsConfiguration">
     <sourceRoots>
       <file path="$PROJECT_DIR$/src" />
-      <file path="$PROJECT_DIR$/src/core" />
-      <file path="$PROJECT_DIR$/src/event" />
-      <file path="$PROJECT_DIR$/src/vulkan" />
       <file path="$PROJECT_DIR$/test" />
     </sourceRoots>
     <libraryRoots>
+      <file path="$PROJECT_DIR$/lib/Vulkan-Headers" />
+      <file path="$PROJECT_DIR$/lib/Vulkan-Loader" />
       <file path="$PROJECT_DIR$/lib/VulkanMemoryAllocator" />
+      <file path="$PROJECT_DIR$/lib/glfw" />
+      <file path="$PROJECT_DIR$/lib/glm" />
+      <file path="$PROJECT_DIR$/lib/glslang" />
+      <file path="$PROJECT_DIR$/lib/imgui" />
     </libraryRoots>
   </component>
 </project>
