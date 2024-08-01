@@ -14,6 +14,25 @@ endif()
 
 set(XTP_LINK_LIBS XTPCore)
 
+if (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
+    set(XTP_USE_TRACY TRUE)
+    set(XTP_USE_IMGUI_UI TRUE)
+    set(XTP_USE_GLTF_LOADING TRUE)
+    set(XTP_USE_ADVANCED_TIMING TRUE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTRACY_ENABLE")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTP_USE_IMGUI_UI")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTP_USE_GLTF_LOADING")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTP_USE_ADVANCED_TIMING")
+
+
+    set(XTP_LINK_LIBS ${XTP_LINK_LIBS} XTP::imgui implot)
+endif ()
+
+add_subdirectory(../src/backends/glfw ${CMAKE_CURRENT_BINARY_DIR}/glfwWindowing)
+add_subdirectory(../src/core ${CMAKE_CURRENT_BINARY_DIR}/core)
+add_subdirectory(../lib/glslang ${CMAKE_CURRENT_BINARY_DIR}/glslang)
+
+
 set(XTP_TEST_SOURCES
         XTPTest.cpp
         TestWindowData.h
@@ -25,24 +44,6 @@ set(XTP_TEST_SOURCES
         TestRenderable.h
 )
 
-if (CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES RelWithDebInfo)
-    set(XTP_USE_TRACY TRUE)
-    set(XTP_USE_IMGUI_UI TRUE)
-    set(XTP_USE_GLTF_LOADING TRUE)
-    set(XTP_USE_ADVANCED_TIMING TRUE)
-
-    set(XTP_TEST_SOURCES ${XTP_TEST_SOURCES}
-            TestImGuiRenderer.cpp
-            TestImGuiRenderer.h
-    )
-
-    set(XTP_LINK_LIBS ${XTP_LINK_LIBS} XTP::imgui implot)
-endif ()
-
-add_subdirectory(../src/core ${CMAKE_CURRENT_BINARY_DIR}/core)
-add_subdirectory(../lib/glslang ${CMAKE_CURRENT_BINARY_DIR}/glslang)
-add_subdirectory(../src/backends/glfw ${CMAKE_CURRENT_BINARY_DIR}/glfwWindowing)
-
 if (${XTP_USE_IMGUI_UI})
     add_library(implot
             ../lib/implot/implot.cpp
@@ -50,6 +51,11 @@ if (${XTP_USE_IMGUI_UI})
             ../lib/implot/implot_demo.cpp
             ../lib/implot/implot_internal.h
             ../lib/implot/implot_items.cpp
+    )
+
+    set(XTP_TEST_SOURCES ${XTP_TEST_SOURCES}
+            TestImGuiRenderer.cpp
+            TestImGuiRenderer.h
     )
 
     target_include_directories(implot PUBLIC

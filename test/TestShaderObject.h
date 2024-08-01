@@ -23,7 +23,7 @@ public:
 
     VertexInput getVertexInput() override;
 
-    TestShaderObject(const std::string& vertexShaderPath, const std::string &fragmentShaderPath, const ShaderProperties &properties): SimpleShaderObject(vertexShaderPath, fragmentShaderPath, properties, VK_SHADER_STAGE_VERTEX_BIT, sizeof(TestShaderData)) {
+    TestShaderObject(const std::string& vertexShaderPath, const std::string &fragmentShaderPath, const ShaderProperties &properties): SimpleShaderObject(vertexShaderPath, fragmentShaderPath, properties, {{VK_SHADER_STAGE_VERTEX_BIT, sizeof(TestShaderData), 0}}) {
     }
 
     void initRenderable(Renderable *renderable) override {

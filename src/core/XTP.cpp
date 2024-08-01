@@ -21,6 +21,7 @@ void XTP::init(const std::chrono::nanoseconds tickInterval) {
     }
     XTPWindowing::windowBackend->createWindow();
     XTPVulkan::init();
+    XTPWindowing::windowBackend->postRendererInit();
     TimeManager::startup();
     Events::callFunctionOnAllEventsOfType<InitEvent>([](auto e) {e->onInit();});
 

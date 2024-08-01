@@ -405,7 +405,7 @@ public:
     }
 
     template <class T> static void bindPushConstant(VkCommandBuffer commandBuffer, const T &pushConstant, SimpleShaderObject* object, int pushConstantIndex = 0) {
-        vkCmdPushConstants(commandBuffer, object->pipelineLayout, object->pushConstants[pushConstantIndex], object->pushConstants[pushConstantIndex].offset, object->pushConstants[pushConstantIndex].size, &pushConstant);
+        vkCmdPushConstants(commandBuffer, object->pipelineLayout, object->pushConstants[pushConstantIndex].pushConstantShaderStages, object->pushConstants[pushConstantIndex].offset, object->pushConstants[pushConstantIndex].size, &pushConstant);
     }
 };
 

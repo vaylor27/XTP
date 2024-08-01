@@ -41,6 +41,8 @@ public:
 
     virtual void waitForEvents() = 0;
 
+    virtual void postRendererInit() = 0;
+
     virtual void pollEvents() = 0;
 
     virtual bool createVulkanSurface(VkInstance instance, VkSurfaceKHR* surface) = 0;

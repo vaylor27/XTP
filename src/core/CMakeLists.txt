@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD 17)
 if (NOT TARGET XTPCore)
     if(APPLE)
         enable_language(OBJC)
-        set(APPLE_STATIC_LOADER TRUE)
     endif()
 
     set(XTP_LINK_LIBS Vulkan::Headers Vulkan::Loader glm::glm GPUOpen::VulkanMemoryAllocator)
@@ -15,6 +14,7 @@ if (NOT TARGET XTPCore)
     if (${XTP_USE_GLTF_LOADING})
         add_subdirectory(../../lib/tinygltf ${CMAKE_CURRENT_BINARY_DIR}/tinygltf)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTP_USE_GLTF_LOADING")
+        set(XTP_LINK_LIBS ${XTP_LINK_LIBS} tinygltf)
     endif ()
 
     if (${XTP_USE_TRACY})
@@ -26,27 +26,6 @@ if (NOT TARGET XTPCore)
     if (${XTP_USE_IMGUI_UI})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DXTP_USE_IMGUI_UI")
         set(XTP_LINK_LIBS ${XTP_LINK_LIBS} XTP::imgui)
-        add_library(imgui
-                ../../lib/imgui/imconfig.h
-                ../../lib/imgui/imgui.h
-                ../../lib/imgui/imgui.cpp
-                ../../lib/imgui/imgui_demo.cpp
-                ../../lib/imgui/imgui_draw.cpp
-                ../../lib/imgui/imgui_internal.h
-                ../../lib/imgui/imgui_tables.cpp
-                ../../lib/imgui/imgui_widgets.cpp
-                ../../lib/imgui/imstb_rectpack.h
-                ../../lib/imgui/imstb_textedit.h
-                ../../lib/imgui/imstb_truetype.h
-                ../../lib/imgui/backends/imgui_impl_vulkan.h
-                ../../lib/imgui/backends/imgui_impl_vulkan.cpp
-        )
-        target_link_libraries(imgui Vulkan::Headers Vulkan::Loader)
-
-        target_include_directories(imgui PUBLIC
-                ../../lib/imgui)
-
-        add_library(XTP::imgui ALIAS imgui)
     endif ()
 
     if (${XTP_USE_ADVANCED_TIMING})
@@ -125,7 +104,7 @@ if (NOT TARGET XTPCore)
     target_link_libraries(VKE Vulkan::Headers Vulkan::Loader)
     target_include_directories(VKE PUBLIC ../../lib/Vulkan-Descriptor-Allocator)
 
-    target_link_libraries(XTPCore ${XTP_LINK_LIBS} VKE XTP::stb tinygltf)
+    target_link_libraries(XTPCore ${XTP_LINK_LIBS} VKE XTP::stb)
 
     if (APPLE AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 

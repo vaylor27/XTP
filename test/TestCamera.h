@@ -34,17 +34,17 @@ public:
     }
 
     void updateCamera() override {
-        calculateZoom();
         if (XTPWindowing::windowBackend->isMouseCaptured()) {
+            calculateZoom();
             calculatePitch();
             calculateAngleAroundFocusPoint();
-        }
 
-        const double horizontalDistance = getHorizontalDistanceFromFocusPoint();
-        const double verticalDistance = getVerticalDistanceFromFocusPoint();
-        calculateCameraPosition(horizontalDistance, verticalDistance);
-        yaw = 180 - (focusPointRotation.y + angleAroundFocusPoint);
-        shouldUpdateViewMatrix = true;
+            const double horizontalDistance = getHorizontalDistanceFromFocusPoint();
+            const double verticalDistance = getVerticalDistanceFromFocusPoint();
+            calculateCameraPosition(horizontalDistance, verticalDistance);
+            yaw = 180 - (focusPointRotation.y + angleAroundFocusPoint);
+            shouldUpdateViewMatrix = true;
+        }
     }
 
     [[nodiscard]] double getHorizontalDistanceFromFocusPoint() const {

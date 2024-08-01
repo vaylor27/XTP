@@ -19,11 +19,8 @@
 #include "glm/glm.hpp"
 #include <ranges>
 #include "AllocatedImage.h"
-#define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
-#include "tiny_gltf.h"
 
 #include "Camera.h"
 
@@ -52,10 +49,6 @@ VkDescriptorPool XTPVulkan::imguiPool;
 VkQueryPool XTPVulkan::timeQueryPool;
 std::vector<uint64_t> XTPVulkan::renderTimeNanos;
 std::vector<bool> XTPVulkan::timeQueryInitialized;
-#endif
-
-#ifdef XTP_USE_GLTF_LOADING
-tinygltf::TinyGLTF XTPVulkan::gltfLoader {};
 #endif
 std::vector<VkExtensionProperties> XTPVulkan::availableDeviceExtensions;
 std::vector<VkLayerProperties> XTPVulkan::availableValidationLayers;
@@ -101,6 +94,11 @@ SimpleLogger *XTPVulkan::logger = new SimpleLogger("Debug Vulkan Renderer", DEBU
 #else
 SimpleLogger *XTPVulkan::logger = new SimpleLogger("Vulkan Renderer", INFORMATION);
 #endif
+
+bool QueueFamilyIndices::isComplete() const {
+    ZoneScopedN("QueueFamilyIndices::isComplete");
+    return graphicsFamily.has_value() && presentFamily.has_value() && graphicsScore > 0 && gresentScore > 0;
+}
 
 void XTPVulkan::init() {
     ZoneScopedN("XTPVulkan::init");
@@ -628,31 +626,6 @@ XTPVulkan::DescriptorSet XTPVulkan::createDescriptorSet(VkDescriptorSetLayout la
     return {set, type};
 }
 
-void XTPVulkan::loadGltfModel(bool isBinaryGltf, const char *path, const char *sceneToLoad) {
-    tinygltf::Model model;
-    std::string err;
-    std::string warn;
-    (isBinaryGltf ? gltfLoader.LoadASCIIFromFile : gltfLoader.LoadBinaryFromFile)(&model, &err, &warn, path, tinygltf::REQUIRE_VERSION);
-
-    tinygltf::Scene scene;
-    if (sceneToLoad == nullptr) {
-        scene = model.scenes[0];
-    } else {
-        for (const auto& scn : model.scenes) {
-            if (strcmp(sceneToLoad, scene.name.c_str()) == 0) {
-                scene = scn;
-                break;
-            }
-        }
-    }
-
-    std::vector<tinygltf::Node> nodes(scene.nodes.size());
-
-    for (int i = 0; i < scene.nodes.size(); ++i) {
-        nodes[i] = model.nodes[scene.nodes[i]];
-    }
-}
-
 uint64_t XTPVulkan::fetchRenderTimeNanos() {
 #ifdef XTP_USE_ADVANCED_TIMING
     std::vector<long double> times;
@@ -774,23 +747,6 @@ void XTPVulkan::destroyAllocatedBuffer(AllocatedBuffer *buffer) {
     buffer->alive = false;
 }
 
-template<class T>
-AllocatedBuffer XTPVulkan::createBufferWithDataStaging(const std::vector<T> &data, const VkBufferUsageFlagBits usage) {
-    AllocatedBuffer buf {};
-    const VkDeviceSize bufferSize = sizeof(data[0]) * data.size();
-
-    buf = createSimpleBuffer(bufferSize, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
-
-    AllocatedBuffer staging = createSimpleBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, false);
-    void* map = staging.info.pMappedData;
-    memcpy(map, data.data(), staging.info.size);
-
-    copyBuffer(staging, buf, bufferSize);
-
-    destroyAllocatedBuffer(&staging);
-
-    return buf;
-}
 
 void XTPVulkan::copyBuffer(AllocatedBuffer srcBuffer, AllocatedBuffer dstBuffer, VkDeviceSize size) {
     immediateSubmit([size, srcBuffer, dstBuffer](const VkCommandBuffer& cmd) {

@@ -12,6 +12,11 @@
 #include "XTPVulkan.h"
 #include "XTPWindowing.h"
 #include "XTPWindowBackend.h"
+#ifdef XTP_USE_IMGUI_UI
+#include "backends/imgui_impl_glfw.h"
+#endif
+
+struct ImGui_ImplGlfw_Data;
 
 class GLFWWindowBackend final: public XTPWindowBackend {
 public:
@@ -34,6 +39,9 @@ public:
     }
 
     void endFrame() override {
+#ifdef XTP_USE_IMGUI_UI
+        ImGui_ImplGlfw_NewFrame();
+#endif
         scrollDelta = {0, 0};
         mouseDelta = {0, 0};
     }
@@ -55,21 +63,37 @@ public:
     }
 
     static void initCallbacks() {
+        glfwSetWindowFocusCallback(window, [](GLFWwindow* window, const int focused) {
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_WindowFocusCallback(window, focused);
+#endif
+        });
+        glfwSetCursorEnterCallback(window, [](GLFWwindow* window, const int entered) {
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_CursorEnterCallback(window, entered);
+#endif
+        });
         glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
             XTPWindowing::windowBackend->framebufferResized = true;
         });
 
-        glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset) {
+        glfwSetScrollCallback(window, [](GLFWwindow* window, const double xoffset, const double yoffset) {
             scrollDelta = glm::dvec2 {xoffset, yoffset};
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
+#endif
         });
 
-        glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+        glfwSetCursorPosCallback(window, [](GLFWwindow* window, const double xpos, const double ypos) {
             if (!initializedMousePos) {
                 mousePos = glm::dvec2 {xpos, ypos};
                 initializedMousePos = true;
             }
             mouseDelta = mousePos - glm::dvec2 {xpos, ypos};
             mousePos = glm::dvec2 {xpos, ypos};
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+#endif
         });
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow *window, int button, int action, int mods) {
@@ -77,13 +101,29 @@ public:
             Events::callFunctionOnAllEventsOfType<KeyPressEvent>([button, action, mods](auto event) {
                 event->onKeyPressed(button, action, mods);
             });
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+#endif
         });
 
-        glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
+        glfwSetKeyCallback(window, [](GLFWwindow *window, int key, const int scancode, int action, int mods) {
             keys[key] = action == GLFW_REPEAT || action == GLFW_PRESS;
             Events::callFunctionOnAllEventsOfType<KeyPressEvent>([key, action, mods](auto event) {
                 event->onKeyPressed(key, action, mods);
             });
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_KeyCallback(window, key, scancode, action, mods);
+#endif
+        });
+        glfwSetCharCallback(window, [](GLFWwindow* window, const unsigned int charr) {
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_CharCallback(window, charr);
+#endif
+        });
+        glfwSetMonitorCallback([](GLFWmonitor* monitor, int event) {
+#ifdef XTP_USE_IMGUI_UI
+            ImGui_ImplGlfw_MonitorCallback(monitor, event);
+#endif
         });
     }
 
@@ -91,16 +131,28 @@ public:
         if (XTPWindowing::data == nullptr) {
             throw std::runtime_error("Window Data Must Not Be Null!");
         }
-        glfwInit();
+        int result = glfwInit();
+        if (result != GLFW_TRUE) {
+            throw std::runtime_error("Failed To Initialize GLFW");
+        }
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
         window = glfwCreateWindow(XTPWindowing::data->getWidth(), XTPWindowing::data->getHeight(), XTPWindowing::data->getWindowTitle(), nullptr, nullptr);
+    }
 
+    void postRendererInit() override {
+#ifdef XTP_USE_IMGUI_UI
+        ImGui_ImplGlfw_InitForVulkan(window, true);
+#endif
         initCallbacks();
     }
 
     bool createVulkanSurface(VkInstance instance, VkSurfaceKHR* surface) override {
-        return glfwCreateWindowSurface(instance, window, nullptr, surface) == VK_SUCCESS;
+        VkResult result = glfwCreateWindowSurface(instance, window, nullptr, surface);
+        if (result == VK_SUCCESS) {
+            return true;
+        }
+        return false;
     }
 
     const char **getRequiredInstanceExtensions(uint32_t& count) override {

@@ -6,7 +6,6 @@
 
 #include <set>
 #include <cstdint> // Necessary for uint32_t
-#include <tiny_gltf.h>
 #include "AllocatedImage.h"
 #include "descriptor_allocator.h"
 #include "buffer/AllocatedBuffer.h"
@@ -103,9 +102,6 @@ public:
     static std::vector<AllocatedImage> allLoadedImages;
     static std::vector<VkSampler> samplers;
     static AllocatedImage depthImage;
-#ifdef XTP_USE_GLTF_LOADING
-    static tinygltf::TinyGLTF gltfLoader;
-#endif
 
     static void drawFrame();
 
@@ -220,7 +216,22 @@ public:
 
     static void destroyAllocatedImage(AllocatedImage *image);
 
-    template <class T> [[nodiscard]] static AllocatedBuffer createBufferWithDataStaging(const std::vector<T>& data, VkBufferUsageFlagBits usage);
+    template <class T> [[nodiscard]] static AllocatedBuffer createBufferWithDataStaging(const std::vector<T>& data, VkBufferUsageFlagBits usage) {
+        AllocatedBuffer buf {};
+        const VkDeviceSize bufferSize = sizeof(data[0]) * data.size();
+
+        buf = createSimpleBuffer(bufferSize, usage | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
+
+        AllocatedBuffer staging = createSimpleBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY, false);
+        void* map = staging.info.pMappedData;
+        memcpy(map, data.data(), staging.info.size);
+
+        copyBuffer(staging, buf, bufferSize);
+
+        destroyAllocatedBuffer(&staging);
+
+        return buf;
+    }
 
 
     static void copyBuffer(AllocatedBuffer srcBuffer, AllocatedBuffer dstBuffer, VkDeviceSize size);
